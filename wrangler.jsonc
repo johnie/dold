@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dold",
+  "compatibility_date": "2024-04-01",
+  "main": "./src/index.tsx",
+  "kv_namespaces": [
+    {
+      "binding": "DOLD",
+      "id": "a48ba4dc336c420b8e26ff511e82be23",
+      "preview_id": "a48ba4dc336c420b8e26ff511e82be23"
+    }
+  ]
+}
