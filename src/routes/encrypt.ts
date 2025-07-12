@@ -60,7 +60,6 @@ router.post('/', zValidator('json', encryptSchema), async (c) => {
 
     return c.json({ id, doldKey });
   } catch (error) {
-    console.error(error);
     return c.json({ error: 'Encryption failed' }, 500);
   }
 });

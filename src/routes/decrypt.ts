@@ -57,7 +57,6 @@ router.post('/', zValidator('json', decryptSchema), async (c) => {
 
     return c.json({ message: decryptedMessage });
   } catch (error) {
-    console.error(error);
     return c.json(
       {
         error:
