@@ -11,7 +11,7 @@ app.use('*', cors());
 app.use(renderer);
 
 app.get('/', (c) => {
-  return c.render(<h1>Hello!</h1>);
+  return c.render(<div id="root"></div>);
 });
 
 const apiRoutes = app.route('/api', router);
