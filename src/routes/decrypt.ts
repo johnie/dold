@@ -24,9 +24,7 @@ router.post('/', zValidator('json', decryptSchema), async (c) => {
       return c.json({ error: 'Secret or key not found or has expired' }, 404);
     }
 
-    const parsedJwk = JSON.parse(
-      base64UrlDecode(storedKey.replace('dold:key:', ''))
-    );
+    const parsedJwk = JSON.parse(base64UrlDecode(storedKey));
     const { encrypted, iv } = JSON.parse(storedSecret);
 
     const key = await crypto.subtle.importKey(
