@@ -9,12 +9,13 @@ const router = new Hono<DoldApp>();
 const encryptSchema = z
   .object({
     message: z.string().min(1, 'Message is required'),
+    expirationTtl: z.number().optional().default(3600),
   })
   .strict();
 
 router.post('/', zValidator('json', encryptSchema), async (c) => {
   try {
-    const { message } = c.req.valid('json');
+    const { message, expirationTtl } = c.req.valid('json');
 
     const key = (await crypto.subtle.generateKey(
       {
@@ -39,7 +40,7 @@ router.post('/', zValidator('json', encryptSchema), async (c) => {
     );
 
     const jwk = await crypto.subtle.exportKey('jwk', key);
-    const exportedKey = 'dold:key:' + base64UrlEncode(JSON.stringify(jwk));
+    const exportedKey = base64UrlEncode(JSON.stringify(jwk));
 
     const doldKey = generateId(32);
     const id = generateId();
@@ -50,10 +51,12 @@ router.post('/', zValidator('json', encryptSchema), async (c) => {
         encrypted: arrayBufferToBase64(encrypted),
         iv: arrayBufferToBase64(iv.buffer),
       }),
-      { expirationTtl: 86400 }
+      { expirationTtl }
     );
 
-    await c.env.DOLD.put(doldKey, exportedKey);
+    await c.env.DOLD.put(doldKey, exportedKey, {
+      expirationTtl,
+    });
 
     return c.json({ id, doldKey });
   } catch (error) {
