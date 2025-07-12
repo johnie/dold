@@ -1,8 +1,8 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
-import { generateId, arrayBufferToBase64, base64UrlEncode } from '../lib/utils';
+import { generateId, arrayBufferToBase64, base64UrlEncode } from '@/lib/utils';
 import { zValidator } from '@hono/zod-validator';
-import type { DoldApp } from '../types';
+import type { DoldApp } from '@/types';
 
 const router = new Hono<DoldApp>();
 
