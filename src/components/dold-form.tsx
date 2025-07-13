@@ -9,8 +9,38 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useCallback } from 'react';
+import { toast } from 'sonner';
+// import { hc } from 'hono/client';
+// import type { InferResponseType } from 'hono/client';
+// import type { RouteType } from '@/index';
+// import type { AppType } from '@/routes';
+
+// const client = hc<AppType>('/');
 
 export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault();
+    const formData = new FormData(event.target as HTMLFormElement);
+
+    const response = await fetch('/api/encrypt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: formData.get('message'),
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('Error:', response.statusText);
+    } else {
+      const data = await response.json();
+      console.log('Success:', data);
+      toast('Message encrypted successfully!');
+    }
+  }, []);
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
@@ -21,37 +51,21 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Textarea id="email" placeholder="Enter your email" />
-              </div>
-              <div className="grid gap-3">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  name="message"
+                  placeholder="Enter your message"
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  Login
-                </Button>
-                <Button variant="outline" className="w-full">
-                  Login with Google
+                  Encrypt
                 </Button>
               </div>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
             </div>
           </form>
         </CardContent>
