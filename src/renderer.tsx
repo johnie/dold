@@ -6,12 +6,14 @@ import {
   ReactRefresh,
 } from 'vite-ssr-components/react';
 
-export const renderer = reactRenderer(({ children }) => {
+export const renderer = reactRenderer(({ children, title, description }) => {
   return (
     <html lang="en" className="dark">
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{title}</title>
+        {description && <meta name="description" content={description} />}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
