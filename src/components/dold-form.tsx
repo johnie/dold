@@ -1,54 +1,36 @@
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
-// import { hc } from 'hono/client';
-// import type { InferResponseType } from 'hono/client';
-// import type { RouteType } from '@/index';
-// import type { AppType } from '@/routes';
+import { hc } from 'hono/client';
+import type { RouteType } from '@/index';
 
-// const client = hc<AppType>('/');
+const client = hc<RouteType>('/');
 
 export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
 
-    const response = await fetch('/api/encrypt', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await client.api.encrypt.$post({
+      json: {
+        message: formData.get('message') as string,
       },
-      body: JSON.stringify({
-        message: formData.get('message'),
-      }),
     });
 
-    if (!response.ok) {
-      console.error('Error:', response.statusText);
-    } else {
-      const data = await response.json();
-      console.log('Success:', data);
+    if (response.ok) {
       toast('Message encrypted successfully!');
     }
   }, []);
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Login to your account</CardTitle>
-          <CardDescription>
-            Enter your email below to login to your account
-          </CardDescription>
+          <CardTitle>Encrypt your message with Dold</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
@@ -59,6 +41,9 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                   id="message"
                   name="message"
                   placeholder="Enter your message"
+                  required
+                  minLength={5}
+                  maxLength={500}
                 />
               </div>
               <div className="flex flex-col gap-3">
