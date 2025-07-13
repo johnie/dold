@@ -3,3 +3,8 @@ export type DoldApp = {
     DOLD: KVNamespace;
   };
 };
+
+export type Meta = {
+  title: string;
+  description?: string;
+};

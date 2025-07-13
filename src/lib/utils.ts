@@ -1,3 +1,4 @@
+import { APP_NAME } from '@/contants';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -41,4 +42,8 @@ export const base64UrlEncode = (str: string) => {
 
 export const base64UrlDecode = (base64str: string) => {
   return atob(base64str.replace(/-/g, '+').replace(/_/g, '/'));
+};
+
+export const titleTemplate = (title: string) => {
+  return title ? `${title} | ${APP_NAME}` : APP_NAME;
 };
