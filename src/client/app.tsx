@@ -1,4 +1,5 @@
 import { DoldForm } from '@/components/dold-form';
+import { DoldLogo } from '@/components/logo';
 import { use, Suspense } from 'react';
 
 // import { hc } from 'hono/client';
@@ -29,6 +30,7 @@ const App = () => {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-sm">
+        <DoldLogo />
         <Suspense fallback={'loading...'}>
           <DoldForm className="my-custom-class" />
           <Component promise={fetchData()} />
