@@ -15,6 +15,23 @@ import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono<DoldApp>();
 
+const encryptSchema = z
+  .object({
+    message: z.string().min(1, 'Message is required'),
+    expirationTtl: z.number().min(300).optional().default(3600),
+  })
+  .strict();
+
+const id = z.string().min(16, 'ID is required');
+const doldKey = z.string().min(32, 'Dold Key is required');
+
+const decryptSchema = z
+  .object({
+    id,
+    doldKey,
+  })
+  .strict();
+
 app.use('*', cors());
 
 app.use(renderer);
@@ -26,19 +43,18 @@ app.get('/', (c) => {
   });
 });
 
-const encryptSchema = z
-  .object({
-    message: z.string().min(1, 'Message is required'),
-    expirationTtl: z.number().min(300).optional().default(3600),
-  })
-  .strict();
-
-const decryptSchema = z
-  .object({
-    id: z.string().min(16, 'ID is required'),
-    doldKey: z.string().min(32, 'Dold Key is required'),
-  })
-  .strict();
+app.get(
+  '/:id',
+  zValidator('param', z.object({ id })),
+  zValidator('query', z.object({ doldKey })),
+  async (c) => {
+    return c.render(<div id="root"></div>, {
+      title: titleTemplate('Decrypt Message'),
+      description: 'Decrypt your secure message with Dold.',
+      clientScript: '/src/client/id.tsx',
+    });
+  }
+);
 
 const routes = app
   .post('/api/encrypt', zValidator('json', encryptSchema), async (c) => {
@@ -61,7 +77,7 @@ const routes = app
       const encrypted = await crypto.subtle.encrypt(
         {
           name: 'AES-GCM',
-          iv: iv,
+          iv,
         },
         key,
         encodedMessage

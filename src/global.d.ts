@@ -10,5 +10,7 @@ declare module 'hono' {
 }
 
 declare module '@hono/react-renderer' {
-  interface Props extends Meta {}
+  interface Props extends Meta {
+    clientScript?: string;
+  }
 }

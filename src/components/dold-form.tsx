@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
@@ -11,9 +11,14 @@ import type { RouteType } from '@/index';
 const client = hc<RouteType>('/');
 
 export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
+  const [loading, setLoading] = useState(false);
+  const [sharedURL, setSharedURL] = useState<string | null>(null);
+
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
+
+    setLoading(true);
 
     const response = await client.api.encrypt.$post({
       json: {
@@ -23,7 +28,22 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
 
     if (response.ok) {
       toast('Message encrypted successfully!');
+      setLoading(false);
     }
+
+    const result = await response.json();
+
+    if ('error' in result) {
+      setLoading(false);
+      return;
+    }
+
+    const { id, doldKey } = result;
+    const url = new URL(window.location.href);
+    url.pathname = `/${id}`;
+    url.searchParams.set('doldKey', doldKey);
+    setSharedURL(url.toString());
+    setLoading(false);
   }, []);
 
   return (
@@ -51,6 +71,21 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                   Encrypt
                 </Button>
               </div>
+              {sharedURL && (
+                <div className="text-sm text-muted-foreground">
+                  Your encrypted message is ready! Share this URL:
+                  <div className="mt-2">
+                    <a
+                      href={sharedURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      {sharedURL}
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </CardContent>
