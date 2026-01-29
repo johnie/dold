@@ -31,7 +31,7 @@
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.2.3",
+    "@cloudflare/vite-plugin": "^1.22.1",
     "@cloudflare/workers-types": "^4.20250712.0",
     "@types/node": "^24.0.13",
     "@types/react": "^19.1.8",
