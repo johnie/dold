@@ -21,8 +21,8 @@ importers:
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.1.8)(react@19.2.4)
       '@scalar/hono-api-reference':
-        specifier: ^0.9.10
-        version: 0.9.10(hono@4.11.7)
+        specifier: ^0.9.38
+        version: 0.9.38(hono@4.11.7)
       '@tailwindcss/vite':
         specifier: ^4.1.18
         version: 4.1.18(vite@6.3.5(@types/node@24.0.13)(jiti@2.6.1)(lightningcss@1.30.2))
@@ -905,22 +905,22 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@scalar/core@0.3.8':
-    resolution: {integrity: sha512-PsoOAviIbka+SqtSrBMEhK870Y47Zg32b/tqDf/nscWoOoPeBI054ppT0lcKv+IPlin/u/z8tem+i5uoOEEMEA==}
+  '@scalar/core@0.3.35':
+    resolution: {integrity: sha512-VdqJ5I8mDubiS8sWBoFxiTlAi4xWBDOchXRLX0GkzRkwR4zjyS51WRqjWETLj+NfP/mKIGxGabkRuelSmvHEDg==}
     engines: {node: '>=20'}
 
-  '@scalar/hono-api-reference@0.9.10':
-    resolution: {integrity: sha512-BuBOTfdmI0BM3vqJXU2jhif1hnm0vJQJX5Y0xhMBeFKEeXnGEgKGodsuD9tKGyuJdp12wiRlFB03khZVa/yXnw==}
+  '@scalar/helpers@0.2.9':
+    resolution: {integrity: sha512-Y4ffJF0yELdwZ0BKgonqn3SumIgRn1WKyYCVHD+TDM7qRFChdGRypyt20+efHs26fmJeyBAIIv2laICj5uimiw==}
+    engines: {node: '>=20'}
+
+  '@scalar/hono-api-reference@0.9.38':
+    resolution: {integrity: sha512-0JWbXoUVcxUb6rhHzVfxlJxfzE6tjpUj2nvm2t4QVH1g7j8fm/YWRfvLAPMEZMZ2+8mbv7ftev9Gn0XDSTgg1w==}
     engines: {node: '>=20'}
     peerDependencies:
-      hono: ^4.0.0
+      hono: ^4.11.4
 
-  '@scalar/openapi-types@0.3.5':
-    resolution: {integrity: sha512-/iTUSJMMHVMIFJngeIjTVtU5lwIMNyEIm25e0XtDV0veW6zmIhLsaH2/nwpIgR1iXVyd/uWMyMrtQW329s3c4w==}
-    engines: {node: '>=20'}
-
-  '@scalar/types@0.2.8':
-    resolution: {integrity: sha512-K2OibPVRxIx0KXBQvYmwySHStVbcLVGfPuHQnHALMKR9sHjpfZtl6cmBlDoKAwzkCAtjwhcnyvUTDBGf79pIEw==}
+  '@scalar/types@0.6.0':
+    resolution: {integrity: sha512-s+KRRM1NBC/6q74DtxhlkJQgO/POQQXj1k3PuJ54V1IrsS9R6eloxed1uDJLYcG2qKugZdyyDYaEU90lzJB8uw==}
     engines: {node: '>=20'}
 
   '@sindresorhus/is@7.0.2':
@@ -1475,8 +1475,8 @@ packages:
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
 
-  nanoid@5.1.5:
-    resolution: {integrity: sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==}
+  nanoid@5.1.6:
+    resolution: {integrity: sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg==}
     engines: {node: ^18 || >=20}
     hasBin: true
 
@@ -1586,6 +1586,10 @@ packages:
     resolution: {integrity: sha512-HRVVSbCCMbj7/kdWF9Q+bbckjBHLtHMEoJWlkmYzzdwhYMkjkOwubLM6t7NbWKjgKamGDrWL1++KrjUO1t9oAQ==}
     engines: {node: '>=18'}
 
+  tagged-tag@1.0.0:
+    resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
+    engines: {node: '>=20'}
+
   tailwind-merge@3.4.0:
     resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
 
@@ -1623,6 +1627,10 @@ packages:
 
   tw-animate-css@1.3.5:
     resolution: {integrity: sha512-t3u+0YNoloIhj1mMXs779P6MO9q3p3mvGn4k1n3nJPqJw/glZcuijG2qTSN4z4mgNRfW5ZC3aXJFLwDtiipZXA==}
+
+  type-fest@5.4.2:
+    resolution: {integrity: sha512-FLEenlVYf7Zcd34ISMLo3ZzRE1gRjY1nMDTp+bQRBiPsaKyIW8K3Zr99ioHDUgA9OGuGGJPyYpNcffGmBhJfGg==}
+    engines: {node: '>=20'}
 
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
@@ -1769,9 +1777,6 @@ packages:
 
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
-
-  zod@3.24.1:
-    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
   zod@4.3.6:
     resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
@@ -2349,24 +2354,23 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.45.0':
     optional: true
 
-  '@scalar/core@0.3.8':
+  '@scalar/core@0.3.35':
     dependencies:
-      '@scalar/types': 0.2.8
+      '@scalar/types': 0.6.0
 
-  '@scalar/hono-api-reference@0.9.10(hono@4.11.7)':
+  '@scalar/helpers@0.2.9': {}
+
+  '@scalar/hono-api-reference@0.9.38(hono@4.11.7)':
     dependencies:
-      '@scalar/core': 0.3.8
+      '@scalar/core': 0.3.35
       hono: 4.11.7
 
-  '@scalar/openapi-types@0.3.5':
+  '@scalar/types@0.6.0':
     dependencies:
-      zod: 3.24.1
-
-  '@scalar/types@0.2.8':
-    dependencies:
-      '@scalar/openapi-types': 0.3.5
-      nanoid: 5.1.5
-      zod: 3.24.1
+      '@scalar/helpers': 0.2.9
+      nanoid: 5.1.6
+      type-fest: 5.4.2
+      zod: 4.3.6
 
   '@sindresorhus/is@7.0.2': {}
 
@@ -2838,7 +2842,7 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  nanoid@5.1.5: {}
+  nanoid@5.1.6: {}
 
   next-themes@0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
@@ -2961,6 +2965,8 @@ snapshots:
 
   supports-color@10.0.0: {}
 
+  tagged-tag@1.0.0: {}
+
   tailwind-merge@3.4.0: {}
 
   tailwindcss@4.1.18: {}
@@ -2986,6 +2992,10 @@ snapshots:
     optional: true
 
   tw-animate-css@1.3.5: {}
+
+  type-fest@5.4.2:
+    dependencies:
+      tagged-tag: 1.0.0
 
   ufo@1.6.1: {}
 
@@ -3145,7 +3155,5 @@ snapshots:
       zod: 4.3.6
 
   zod@3.22.3: {}
-
-  zod@3.24.1: {}
 
   zod@4.3.6: {}
