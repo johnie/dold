@@ -2,34 +2,75 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/components/ui/input-group';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { toast } from 'sonner';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
-import { IconCopy, IconCheck } from '@tabler/icons-react';
+import { IconCopy, IconCheck, IconInfoCircle } from '@tabler/icons-react';
 
 const client = hc<RouteType>('/');
 
 const TTL_OPTIONS = [
-  { label: '5 minutes', value: 300 },
-  { label: '1 hour', value: 3600 },
-  { label: '24 hours', value: 86400 },
-  { label: '7 days', value: 604800 },
+  { label: '5 minutes', value: '300' },
+  { label: '1 hour', value: '3600' },
+  { label: '24 hours', value: '86400' },
+  { label: '7 days', value: '604800' },
 ] as const;
+
+const formSchema = z.object({
+  message: z
+    .string()
+    .min(5, 'Message must be at least 5 characters')
+    .max(500, 'Message must be at most 500 characters'),
+  ttl: z.string(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [selectedTtl, setSelectedTtl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleSubmit = useCallback(async (event: React.FormEvent) => {
-    event.preventDefault();
-    const formData = new FormData(event.target as HTMLFormElement);
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      message: '',
+      ttl: '3600',
+    },
+  });
 
+  const onSubmit = useCallback(async (values: FormValues) => {
     const response = await client.api.encrypt.$post({
       json: {
-        message: formData.get('message') as string,
-        expirationTtl: Number(formData.get('ttl')),
+        message: values.message,
+        expirationTtl: Number(values.ttl),
       },
     });
 
@@ -37,6 +78,9 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
       const { id } = await response.json();
       const url = `${window.location.origin}/m/${id}`;
       setShareUrl(url);
+      setSelectedTtl(
+        TTL_OPTIONS.find((o) => o.value === values.ttl)?.label ?? null
+      );
       setCopied(false);
       toast('Message encrypted successfully!');
     }
@@ -52,8 +96,10 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
 
   const handleReset = useCallback(() => {
     setShareUrl(null);
+    setSelectedTtl(null);
     setCopied(false);
-  }, []);
+    form.reset();
+  }, [form]);
 
   if (shareUrl) {
     return (
@@ -64,30 +110,36 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
-              <div className="flex gap-2">
-                <input
-                  type="text"
+              <InputGroup>
+                <InputGroupInput
                   readOnly
                   value={shareUrl}
-                  className="flex-1 rounded-md border bg-muted px-3 py-2 text-sm font-mono truncate"
+                  className="font-mono truncate"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={handleCopy}
-                >
-                  {copied ? (
-                    <IconCheck className="size-4" />
-                  ) : (
-                    <IconCopy className="size-4" />
-                  )}
-                </Button>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                This message can only be read once. After opening, it will be
-                permanently deleted.
-              </p>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={handleCopy}
+                  >
+                    {copied ? (
+                      <IconCheck className="size-4" />
+                    ) : (
+                      <IconCopy className="size-4" />
+                    )}
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+              {selectedTtl && (
+                <Badge variant="secondary">Expires in {selectedTtl}</Badge>
+              )}
+              <Alert>
+                <IconInfoCircle className="size-4" />
+                <AlertDescription>
+                  This message can only be read once. After opening, it will be
+                  permanently deleted.
+                </AlertDescription>
+              </Alert>
               <Button variant="outline" onClick={handleReset} className="w-full">
                 Encrypt another message
               </Button>
@@ -105,41 +157,60 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
           <CardTitle>Encrypt your message with Dold</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-3">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <FormField
+                  control={form.control}
                   name="message"
-                  placeholder="Enter your message"
-                  required
-                  minLength={5}
-                  maxLength={500}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Message</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Enter your message"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid gap-3">
-                <Label htmlFor="ttl">Expires after</Label>
-                <select
-                  id="ttl"
+                <FormField
+                  control={form.control}
                   name="ttl"
-                  defaultValue={3600}
-                  className="flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                >
-                  {TTL_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expires after</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {TTL_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex flex-col gap-3">
+                  <Button type="submit" className="w-full">
+                    Encrypt
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Encrypt
-                </Button>
-              </div>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
