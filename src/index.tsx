@@ -7,8 +7,6 @@ import {
   generateId,
   arrayBufferToBase64,
   base64ToArrayBuffer,
-  base64UrlDecode,
-  base64UrlEncode,
   titleTemplate,
 } from '@/lib/utils';
 import { zValidator } from '@hono/zod-validator';
@@ -19,12 +17,15 @@ app.use('*', cors());
 
 app.use(renderer);
 
-app.get('/', (c) => {
+const renderShell = (c: any) => {
   return c.render(<div id="root"></div>, {
     title: titleTemplate('Home'),
     description: 'Welcome to Dold, your secure message encryption service.',
   });
-});
+};
+
+app.get('/', renderShell);
+app.get('/m/:id', renderShell);
 
 const encryptSchema = z
   .object({
@@ -35,8 +36,7 @@ const encryptSchema = z
 
 const decryptSchema = z
   .object({
-    id: z.string().min(16, 'ID is required'),
-    doldKey: z.string().min(32, 'Dold Key is required'),
+    id: z.string().min(8, 'ID is required'),
   })
   .strict();
 
@@ -45,7 +45,7 @@ const routes = app
     try {
       const { message, expirationTtl } = c.req.valid('json');
 
-      const key = (await crypto.subtle.generateKey(
+      const cryptoKey = (await crypto.subtle.generateKey(
         {
           name: 'AES-GCM',
           length: 256,
@@ -63,51 +63,47 @@ const routes = app
           name: 'AES-GCM',
           iv: iv,
         },
-        key,
+        cryptoKey,
         encodedMessage
       );
 
-      const jwk = await crypto.subtle.exportKey('jwk', key);
-      const exportedKey = base64UrlEncode(JSON.stringify(jwk));
+      const jwk = await crypto.subtle.exportKey('jwk', cryptoKey);
 
-      const doldKey = generateId(32);
-      const id = generateId();
+      const id = generateId(8);
 
       await c.env.DOLD.put(
         id,
         JSON.stringify({
           encrypted: arrayBufferToBase64(encrypted),
           iv: arrayBufferToBase64(iv.buffer),
+          key: jwk,
         }),
         { expirationTtl }
       );
 
-      await c.env.DOLD.put(doldKey, exportedKey, {
-        expirationTtl,
-      });
-
-      return c.json({ id, doldKey });
+      return c.json({ id });
     } catch (error) {
       return c.json({ error: 'Encryption failed' }, 500);
     }
   })
   .post('/api/decrypt', zValidator('json', decryptSchema), async (c) => {
     try {
-      const { id, doldKey } = c.req.valid('json');
+      const { id } = c.req.valid('json');
 
       const storedSecret = await c.env.DOLD.get(id);
-      const storedKey = await c.env.DOLD.get(doldKey);
 
-      if (!storedSecret || !storedKey) {
-        return c.json({ error: 'Secret or key not found or has expired' }, 404);
+      if (!storedSecret) {
+        return c.json(
+          { error: 'Secret not found or has expired' },
+          404
+        );
       }
 
-      const parsedJwk = JSON.parse(base64UrlDecode(storedKey));
-      const { encrypted, iv } = JSON.parse(storedSecret);
+      const { encrypted, iv, key } = JSON.parse(storedSecret);
 
-      const key = await crypto.subtle.importKey(
+      const cryptoKey = await crypto.subtle.importKey(
         'jwk',
-        parsedJwk,
+        key,
         {
           name: 'AES-GCM',
         },
@@ -123,7 +119,7 @@ const routes = app
           name: 'AES-GCM',
           iv: ivData,
         },
-        key,
+        cryptoKey,
         encryptedData
       );
 
@@ -131,7 +127,6 @@ const routes = app
       const decryptedMessage = decoder.decode(decrypted);
 
       await c.env.DOLD.delete(id);
-      await c.env.DOLD.delete(doldKey);
 
       return c.json({ message: decryptedMessage });
     } catch (error) {
