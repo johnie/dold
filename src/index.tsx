@@ -81,7 +81,7 @@ const routes = app
         { expirationTtl }
       );
 
-      return c.json({ id });
+      return c.json({ id }, 200);
     } catch (error) {
       return c.json({ error: 'Encryption failed' }, 500);
     }
@@ -128,7 +128,7 @@ const routes = app
 
       await c.env.DOLD.delete(id);
 
-      return c.json({ message: decryptedMessage });
+      return c.json({ message: decryptedMessage }, 200);
     } catch (error) {
       return c.json(
         {
