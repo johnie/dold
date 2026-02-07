@@ -1,8 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useCallback, useState } from 'react';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
+import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
 
 const client = hc<RouteType>('/');
 
@@ -70,7 +73,10 @@ export function DecryptView() {
         )}
 
         {state.status === 'loading' && (
-          <p className="text-sm text-muted-foreground">Decrypting...</p>
+          <div className="flex flex-col gap-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-4 w-48" />
+          </div>
         )}
 
         {state.status === 'success' && (
@@ -78,9 +84,12 @@ export function DecryptView() {
             <div className="rounded-md border bg-muted p-4 text-sm whitespace-pre-wrap break-words">
               {state.message}
             </div>
-            <p className="text-sm text-muted-foreground">
-              This message has been deleted and cannot be viewed again.
-            </p>
+            <Alert>
+              <IconInfoCircle className="size-4" />
+              <AlertDescription>
+                This message has been deleted and cannot be viewed again.
+              </AlertDescription>
+            </Alert>
             <Button variant="ghost" asChild className="w-full">
               <a href="/">Encrypt a new message</a>
             </Button>
@@ -89,7 +98,11 @@ export function DecryptView() {
 
         {state.status === 'error' && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-destructive">{state.error}</p>
+            <Alert variant="destructive">
+              <IconAlertTriangle className="size-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{state.error}</AlertDescription>
+            </Alert>
             <Button variant="ghost" asChild className="w-full">
               <a href="/">Encrypt a new message</a>
             </Button>
