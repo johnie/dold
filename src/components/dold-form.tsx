@@ -7,7 +7,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
-import { Copy, Check } from 'lucide-react';
+import { IconCopy, IconCheck } from '@tabler/icons-react';
 
 const client = hc<RouteType>('/');
 
@@ -78,9 +78,9 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                   onClick={handleCopy}
                 >
                   {copied ? (
-                    <Check className="size-4" />
+                    <IconCheck className="size-4" />
                   ) : (
-                    <Copy className="size-4" />
+                    <IconCopy className="size-4" />
                   )}
                 </Button>
               </div>
