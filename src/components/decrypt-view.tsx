@@ -30,11 +30,11 @@ export function DecryptView() {
         json: { id },
       });
 
-      if (response.ok) {
+      if (response.status === 200) {
         const data = await response.json();
         setState({ status: 'success', message: data.message });
       } else {
-        const data: { error?: string } = await response.json();
+        const data = await response.json();
         setState({
           status: 'error',
           error: data.error ?? 'Failed to decrypt message.',
