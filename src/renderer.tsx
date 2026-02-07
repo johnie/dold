@@ -14,16 +14,6 @@ export const renderer = reactRenderer(({ children, title, description }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title}</title>
         {description && <meta name="description" content={description} />}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap"
-          rel="stylesheet"
-        />
         <ViteClient />
         <ReactRefresh />
         <Link href="/src/style.css" rel="stylesheet" />
