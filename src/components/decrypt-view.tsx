@@ -5,7 +5,13 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useCallback, useState } from 'react';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
-import { IconAlertTriangle, IconInfoCircle } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconCheck,
+  IconCopy,
+  IconInfoCircle,
+} from '@tabler/icons-react';
+import { toast } from 'sonner';
 
 const client = hc<RouteType>('/');
 
@@ -17,6 +23,15 @@ type State =
 
 export function DecryptView() {
   const [state, setState] = useState<State>({ status: 'idle' });
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    if (state.status !== 'success') return;
+    await navigator.clipboard.writeText(state.message);
+    setCopied(true);
+    toast('Message copied to clipboard!');
+    setTimeout(() => setCopied(false), 2000);
+  }, [state]);
 
   const handleReveal = useCallback(async () => {
     const id = window.location.pathname.split('/m/')[1];
@@ -81,8 +96,20 @@ export function DecryptView() {
 
         {state.status === 'success' && (
           <div className="flex flex-col gap-4">
-            <div className="rounded-md border bg-muted p-4 text-sm whitespace-pre-wrap break-words">
+            <div className="relative rounded-md border bg-muted p-4 pr-10 text-sm whitespace-pre-wrap break-words">
               {state.message}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 size-7 text-muted-foreground hover:text-foreground"
+                onClick={handleCopy}
+              >
+                {copied ? (
+                  <IconCheck className="size-4" />
+                ) : (
+                  <IconCopy className="size-4" />
+                )}
+              </Button>
             </div>
             <Alert>
               <IconInfoCircle className="size-4" />
