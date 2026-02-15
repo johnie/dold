@@ -14,24 +14,7 @@ import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono<DoldApp>();
 
-app.use(
-  '*',
-  secureHeaders({
-    contentSecurityPolicy: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", 'data:'],
-      connectSrc: ["'self'"],
-    },
-    referrerPolicy: 'no-referrer',
-    permissionsPolicy: {
-      camera: [],
-      microphone: [],
-      geolocation: [],
-    },
-  })
-);
+app.use('*', secureHeaders());
 app.use('*', csrf());
 
 app.use(renderer);
