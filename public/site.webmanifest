@@ -1,0 +1,7 @@
+{
+  "name": "Dold",
+  "short_name": "dold",
+  "theme_color": "#f0f0f0",
+  "background_color": "#171717",
+  "display": "standalone"
+}
