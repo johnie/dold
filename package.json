@@ -30,14 +30,14 @@
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.1",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0",
+    "tailwind-merge": "^3.4.1",
     "tailwindcss": "^4.1.18",
     "zod": "^4.3.6",
     "zod-openapi": "^5.4.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.25.0",
-    "@cloudflare/workers-types": "^4.20260213.0",
+    "@cloudflare/workers-types": "^4.20260214.0",
     "@types/node": "^25.2.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
