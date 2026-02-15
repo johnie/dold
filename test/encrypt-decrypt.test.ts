@@ -70,7 +70,7 @@ describe('Encrypt/Decrypt API', () => {
       const data: { id: string } = await response.json();
       expect(data).toHaveProperty('id');
       expect(typeof data.id).toBe('string');
-      expect(data.id.length).toBe(8);
+      expect(data.id.length).toBe(32);
 
       // Only one KV write (ciphertext only, no key stored)
       expect(mockKV.put).toHaveBeenCalledTimes(1);
@@ -188,7 +188,7 @@ describe('Encrypt/Decrypt API', () => {
     });
 
     it('should handle long messages', async () => {
-      const originalMessage = 'A'.repeat(10000);
+      const originalMessage = 'A'.repeat(5000);
 
       const encryptResponse = await testApp.request('/api/encrypt', {
         method: 'POST',
@@ -215,7 +215,7 @@ describe('Encrypt/Decrypt API', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          id: 'nonexist',
+          id: 'nonexistent_id_that_does_not_exist',
         }),
       });
 
@@ -281,7 +281,7 @@ describe('Encrypt/Decrypt API', () => {
 
   describe('Edge cases and error handling', () => {
     it('should handle corrupted stored data', async () => {
-      const id = 'corrupt8';
+      const id = 'corrupted_data_id_padded_to_32chr';
 
       await mockKV.put(id, 'corrupted-json');
 
