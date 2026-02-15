@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { renderer } from '@/renderer';
-import { cors } from 'hono/cors';
+import { secureHeaders } from 'hono/secure-headers';
+import { csrf } from 'hono/csrf';
 import type { DoldApp } from '@/types';
 import { z } from 'zod';
 import {
@@ -13,7 +14,25 @@ import { zValidator } from '@hono/zod-validator';
 
 const app = new Hono<DoldApp>();
 
-app.use('*', cors());
+app.use(
+  '*',
+  secureHeaders({
+    contentSecurityPolicy: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:'],
+      connectSrc: ["'self'"],
+    },
+    referrerPolicy: 'no-referrer',
+    permissionsPolicy: {
+      camera: [],
+      microphone: [],
+      geolocation: [],
+    },
+  })
+);
+app.use('*', csrf());
 
 app.use(renderer);
 
@@ -29,14 +48,14 @@ app.get('/m/:id', renderShell);
 
 const encryptSchema = z
   .object({
-    message: z.string().min(1, 'Message is required'),
+    message: z.string().min(1, 'Message is required').max(5000),
     expirationTtl: z.number().min(300).optional().default(3600),
   })
   .strict();
 
 const decryptSchema = z
   .object({
-    id: z.string().min(8, 'ID is required'),
+    id: z.string().min(32, 'ID is required'),
   })
   .strict();
 
@@ -69,7 +88,7 @@ const routes = app
 
       const jwk = await crypto.subtle.exportKey('jwk', cryptoKey);
 
-      const id = generateId(8);
+      const id = generateId(32);
 
       await c.env.DOLD.put(
         id,
