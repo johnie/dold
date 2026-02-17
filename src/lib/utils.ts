@@ -1,4 +1,4 @@
-import { APP_NAME } from '@/contants';
+import { APP_NAME } from '@/constants';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 

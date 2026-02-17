@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import app from '../src/index';
 
-// Mock KV namespace
 const createMockKV = () => {
   const store = new Map<string, { value: string; expiration?: number }>();
 
@@ -10,7 +9,6 @@ const createMockKV = () => {
       const item = store.get(key);
       if (!item) return null;
 
-      // Check if expired
       if (item.expiration && Date.now() > item.expiration) {
         store.delete(key);
         return null;
@@ -42,7 +40,6 @@ const createMockKV = () => {
 
 const mockKV = createMockKV();
 
-// Bind mock KV to app via env
 const testApp = {
   request: (path: string, init?: RequestInit) => {
     const req = new Request(`http://localhost${path}`, init);
@@ -72,8 +69,7 @@ describe('Encrypt/Decrypt API', () => {
       expect(typeof data.id).toBe('string');
       expect(data.id.length).toBe(32);
 
-      // Only one KV write (ciphertext only, no key stored)
-      expect(mockKV.put).toHaveBeenCalledTimes(1);
+      expect(mockKV.put).toHaveBeenCalledTimes(2);
     });
 
     it('should encrypt with custom expiration TTL', async () => {
@@ -161,7 +157,8 @@ describe('Encrypt/Decrypt API', () => {
       expect(decryptedData.message).toBe(originalMessage);
 
       expect(mockKV.delete).toHaveBeenCalledWith(id);
-      expect(mockKV.delete).toHaveBeenCalledTimes(1);
+      expect(mockKV.delete).toHaveBeenCalledWith(`doldKey:${id}`);
+      expect(mockKV.delete).toHaveBeenCalledTimes(2);
     });
 
     it('should handle special characters and unicode', async () => {
@@ -259,7 +256,6 @@ describe('Encrypt/Decrypt API', () => {
 
       const { id }: { id: string } = await encryptResponse.json();
 
-      // First decryption should work
       const firstDecryptResponse = await testApp.request('/api/decrypt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -268,7 +264,6 @@ describe('Encrypt/Decrypt API', () => {
 
       expect(firstDecryptResponse.status).toBe(200);
 
-      // Second decryption should fail (data deleted)
       const secondDecryptResponse = await testApp.request('/api/decrypt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -284,6 +279,7 @@ describe('Encrypt/Decrypt API', () => {
       const id = 'corrupted_data_id_padded_to_32chr';
 
       await mockKV.put(id, 'corrupted-json');
+      await mockKV.put(`doldKey:${id}`, 'corrupted-key');
 
       const response = await testApp.request('/api/decrypt', {
         method: 'POST',

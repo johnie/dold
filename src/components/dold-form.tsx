@@ -32,23 +32,17 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { hc } from 'hono/client';
 import type { RouteType } from '@/index';
+import { TTL_OPTIONS } from '@/lib/schemas';
 import { IconCopy, IconCheck, IconInfoCircle } from '@tabler/icons-react';
 
 const client = hc<RouteType>('/');
 
-const TTL_OPTIONS = [
-  { label: '5 minutes', value: '300' },
-  { label: '1 hour', value: '3600' },
-  { label: '24 hours', value: '86400' },
-  { label: '7 days', value: '604800' },
-] as const;
-
 const formSchema = z.object({
   message: z
     .string()
-    .min(5, 'Message must be at least 5 characters')
-    .max(500, 'Message must be at most 500 characters'),
-  ttl: z.string(),
+    .min(1, 'Message is required')
+    .max(5000, 'Message must be at most 5000 characters'),
+  ttl: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -62,7 +56,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       message: '',
-      ttl: '3600',
+      ttl: 3600,
     },
   });
 
@@ -70,7 +64,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
     const response = await client.api.encrypt.$post({
       json: {
         message: values.message,
-        expirationTtl: Number(values.ttl),
+        expirationTtl: values.ttl,
       },
     });
 
@@ -183,8 +177,8 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                     <FormItem>
                       <FormLabel>Expires after</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        onValueChange={(v) => field.onChange(Number(v))}
+                        value={String(field.value)}
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
@@ -193,7 +187,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                         </FormControl>
                         <SelectContent>
                           {TTL_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={opt.value}>
+                            <SelectItem key={opt.value} value={String(opt.value)}>
                               {opt.label}
                             </SelectItem>
                           ))}
