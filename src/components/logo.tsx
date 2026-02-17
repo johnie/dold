@@ -1,4 +1,4 @@
-import { APP_NAME } from '@/contants';
+import { APP_NAME } from '@/constants';
 import { IconFingerprint } from '@tabler/icons-react';
 
 export function DoldLogo() {
