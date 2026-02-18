@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import type { Handler } from 'hono';
 import { renderer } from '@/renderer';
 import { secureHeaders } from 'hono/secure-headers';
 import { csrf } from 'hono/csrf';
@@ -13,7 +14,7 @@ app.use('*', secureHeaders());
 app.use('*', csrf());
 app.use(renderer);
 
-const renderShell = (c: any) => {
+const renderShell: Handler<DoldApp> = (c) => {
   return c.render(<div id="root"></div>, {
     title: titleTemplate('Home'),
     description: 'Welcome to Dold, your secure message encryption service.',

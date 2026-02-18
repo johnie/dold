@@ -3,7 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { generateId } from '@/lib/utils';
 import { generateAesKey, encryptMessage, exportKey } from '@/lib/crypto';
 import { encryptSchema } from '@/lib/schemas';
-import type { DoldApp } from '@/types';
+import type { DoldApp, StoredCiphertext, StoredKey } from '@/types';
 
 const app = new Hono<DoldApp>();
 
@@ -17,9 +17,12 @@ app.post('/', zValidator('json', encryptSchema), async (c) => {
 
     const id = generateId(32);
 
+    const stored: StoredCiphertext = { encrypted, iv };
+    const storedKey: StoredKey = { key };
+
     await Promise.all([
-      c.env.DOLD.put(id, JSON.stringify({ encrypted, iv }), { expirationTtl }),
-      c.env.DOLD.put(`doldKey:${id}`, JSON.stringify({ key }), { expirationTtl }),
+      c.env.DOLD.put(id, JSON.stringify(stored), { expirationTtl }),
+      c.env.DOLD.put(`doldKey:${id}`, JSON.stringify(storedKey), { expirationTtl }),
     ]);
 
     return c.json({ id }, 200);

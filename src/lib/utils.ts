@@ -2,7 +2,7 @@ import { APP_NAME } from '@/constants';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
@@ -28,23 +28,23 @@ export const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 };
 
 export const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
-  const binary_string = atob(base64);
-  const len = binary_string.length;
+  const binaryString = atob(base64);
+  const len = binaryString.length;
   const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i);
+    bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes.buffer;
 };
 
-export const base64UrlEncode = (str: string) => {
+export const base64UrlEncode = (str: string): string => {
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
-export const base64UrlDecode = (base64str: string) => {
+export const base64UrlDecode = (base64str: string): string => {
   return atob(base64str.replace(/-/g, '+').replace(/_/g, '/'));
 };
 
-export const titleTemplate = (title: string) => {
+export const titleTemplate = (title: string): string => {
   return title ? `${title} | ${APP_NAME}` : APP_NAME;
 };

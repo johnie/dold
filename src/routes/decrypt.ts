@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { zValidator } from '@hono/zod-validator';
 import { decryptMessage, importKey } from '@/lib/crypto';
 import { decryptSchema } from '@/lib/schemas';
-import type { DoldApp } from '@/types';
+import type { DoldApp, StoredCiphertext, StoredKey } from '@/types';
 
 const app = new Hono<DoldApp>();
 
@@ -19,8 +19,8 @@ app.post('/', zValidator('json', decryptSchema), async (c) => {
       return c.json({ error: 'Secret not found or has expired' }, 404);
     }
 
-    const { encrypted, iv } = JSON.parse(ciphertext);
-    const { key } = JSON.parse(keyData);
+    const { encrypted, iv } = JSON.parse(ciphertext) as StoredCiphertext;
+    const { key } = JSON.parse(keyData) as StoredKey;
 
     const cryptoKey = await importKey(key);
     const decryptedMessage = await decryptMessage(cryptoKey, encrypted, iv);
