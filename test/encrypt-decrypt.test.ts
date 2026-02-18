@@ -43,7 +43,7 @@ const mockKV = createMockKV();
 const testApp = {
   request: (path: string, init?: RequestInit) => {
     const req = new Request(`http://localhost${path}`, init);
-    return app.fetch(req, { DOLD: mockKV as any });
+    return app.fetch(req, { DOLD: mockKV as unknown as KVNamespace });
   },
 };
 
