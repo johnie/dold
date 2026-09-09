@@ -1,15 +1,16 @@
-import { Hono } from 'hono';
-import { zValidator } from '@hono/zod-validator';
-import { generateId } from '@/lib/utils';
-import { generateAesKey, encryptMessage, exportKey } from '@/lib/crypto';
-import { encryptSchema } from '@/lib/schemas';
-import type { DoldApp, StoredCiphertext, StoredKey } from '@/types';
+import { zValidator } from "@hono/zod-validator";
+import { Hono } from "hono";
+
+import { generateAesKey, encryptMessage, exportKey } from "@/lib/crypto";
+import { encryptSchema } from "@/lib/schemas";
+import { generateId } from "@/lib/utils";
+import type { DoldApp, StoredCiphertext, StoredKey } from "@/types";
 
 const app = new Hono<DoldApp>();
 
-app.post('/', zValidator('json', encryptSchema), async (c) => {
+app.post("/", zValidator("json", encryptSchema), async (c) => {
   try {
-    const { message, expirationTtl } = c.req.valid('json');
+    const { message, expirationTtl } = c.req.valid("json");
 
     const cryptoKey = await generateAesKey();
     const { encrypted, iv } = await encryptMessage(cryptoKey, message);
@@ -22,12 +23,14 @@ app.post('/', zValidator('json', encryptSchema), async (c) => {
 
     await Promise.all([
       c.env.DOLD.put(id, JSON.stringify(stored), { expirationTtl }),
-      c.env.DOLD.put(`doldKey:${id}`, JSON.stringify(storedKey), { expirationTtl }),
+      c.env.DOLD.put(`doldKey:${id}`, JSON.stringify(storedKey), {
+        expirationTtl,
+      }),
     ]);
 
     return c.json({ id }, 200);
   } catch {
-    return c.json({ error: 'Encryption failed' }, 500);
+    return c.json({ error: "Encryption failed" }, 500);
   }
 });
 
