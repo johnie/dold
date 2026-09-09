@@ -1,22 +1,20 @@
-import { arrayBufferToBase64, base64ToArrayBuffer } from './utils';
+import { arrayBufferToBase64, base64ToArrayBuffer } from "./utils";
 
-export async function generateAesKey(): Promise<CryptoKey> {
-  return crypto.subtle.generateKey(
-    { name: 'AES-GCM', length: 256 },
-    true,
-    ['encrypt', 'decrypt']
-  );
-}
+export const generateAesKey = (): Promise<CryptoKey> =>
+  crypto.subtle.generateKey({ length: 256, name: "AES-GCM" }, true, [
+    "encrypt",
+    "decrypt",
+  ]);
 
-export async function encryptMessage(
+export const encryptMessage = async (
   key: CryptoKey,
   plaintext: string
-): Promise<{ encrypted: string; iv: string }> {
+): Promise<{ encrypted: string; iv: string }> => {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encoder = new TextEncoder();
   const encoded = encoder.encode(plaintext);
   const encrypted = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { iv, name: "AES-GCM" },
     key,
     encoded
   );
@@ -25,28 +23,26 @@ export async function encryptMessage(
     encrypted: arrayBufferToBase64(encrypted),
     iv: arrayBufferToBase64(iv.buffer),
   };
-}
+};
 
-export async function decryptMessage(
+export const decryptMessage = async (
   key: CryptoKey,
   encrypted: string,
   iv: string
-): Promise<string> {
+): Promise<string> => {
   const encryptedData = base64ToArrayBuffer(encrypted);
   const ivData = base64ToArrayBuffer(iv);
   const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: ivData },
+    { iv: ivData, name: "AES-GCM" },
     key,
     encryptedData
   );
   const decoder = new TextDecoder();
   return decoder.decode(decrypted);
-}
+};
 
-export async function exportKey(key: CryptoKey): Promise<JsonWebKey> {
-  return crypto.subtle.exportKey('jwk', key);
-}
+export const exportKey = (key: CryptoKey): Promise<JsonWebKey> =>
+  crypto.subtle.exportKey("jwk", key);
 
-export async function importKey(jwk: JsonWebKey): Promise<CryptoKey> {
-  return crypto.subtle.importKey('jwk', jwk, { name: 'AES-GCM' }, true, ['decrypt']);
-}
+export const importKey = (jwk: JsonWebKey): Promise<CryptoKey> =>
+  crypto.subtle.importKey("jwk", jwk, { name: "AES-GCM" }, true, ["decrypt"]);
