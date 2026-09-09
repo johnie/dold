@@ -1,67 +1,69 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { useCallback, useState } from 'react';
-import { hc } from 'hono/client';
-import type { RouteType } from '@/index';
 import {
   IconAlertTriangle,
   IconCheck,
   IconCopy,
   IconInfoCircle,
-} from '@tabler/icons-react';
-import { toast } from 'sonner';
+} from "@tabler/icons-react";
+import { hc } from "hono/client";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 
-const client = hc<RouteType>('/');
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { RouteType } from "@/index";
+
+const client = hc<RouteType>("/");
 
 type State =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'success'; message: string }
-  | { status: 'error'; error: string };
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; message: string }
+  | { status: "error"; error: string };
 
-export function DecryptView() {
-  const [state, setState] = useState<State>({ status: 'idle' });
+export const DecryptView = () => {
+  const [state, setState] = useState<State>({ status: "idle" });
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
-    if (state.status !== 'success') return;
+    if (state.status !== "success") {
+      return;
+    }
     await navigator.clipboard.writeText(state.message);
     setCopied(true);
-    toast('Message copied to clipboard!');
+    toast("Message copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   }, [state]);
 
   const handleReveal = useCallback(async () => {
-    const id = window.location.pathname.split('/m/')[1];
+    const [, id] = window.location.pathname.split("/m/");
 
     if (!id) {
-      setState({ status: 'error', error: 'Invalid link. Missing ID.' });
+      setState({ error: "Invalid link. Missing ID.", status: "error" });
       return;
     }
 
-    setState({ status: 'loading' });
+    setState({ status: "loading" });
 
     try {
       const response = await client.api.decrypt.$post({
         json: { id },
       });
 
+      const data = await response.json();
       if (response.status === 200) {
-        const data = await response.json();
-        setState({ status: 'success', message: data.message });
+        setState({ message: data.message, status: "success" });
       } else {
-        const data = await response.json();
         setState({
-          status: 'error',
-          error: data.error ?? 'Failed to decrypt message.',
+          error: data.error ?? "Failed to decrypt message.",
+          status: "error",
         });
       }
     } catch {
       setState({
-        status: 'error',
-        error: 'Something went wrong. Please try again.',
+        error: "Something went wrong. Please try again.",
+        status: "error",
       });
     }
   }, []);
@@ -70,15 +72,15 @@ export function DecryptView() {
     <Card>
       <CardHeader>
         <CardTitle>
-          {state.status === 'success'
-            ? 'Decrypted message'
-            : 'You received a secret message'}
+          {state.status === "success"
+            ? "Decrypted message"
+            : "You received a secret message"}
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {state.status === 'idle' && (
+        {state.status === "idle" && (
           <div className="flex flex-col gap-4">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               This message will be permanently deleted after reading.
             </p>
             <Button onClick={handleReveal} className="w-full">
@@ -87,21 +89,21 @@ export function DecryptView() {
           </div>
         )}
 
-        {state.status === 'loading' && (
+        {state.status === "loading" && (
           <div className="flex flex-col gap-4">
             <Skeleton className="h-24 w-full" />
             <Skeleton className="h-4 w-48" />
           </div>
         )}
 
-        {state.status === 'success' && (
+        {state.status === "success" && (
           <div className="flex flex-col gap-4">
-            <div className="relative rounded-md border bg-muted p-4 pr-10 text-sm whitespace-pre-wrap break-words">
+            <div className="bg-muted relative rounded-md border p-4 pr-10 text-sm break-words whitespace-pre-wrap">
               {state.message}
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-2 right-2 size-7 text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground absolute top-2 right-2 size-7"
                 onClick={handleCopy}
               >
                 {copied ? (
@@ -123,7 +125,7 @@ export function DecryptView() {
           </div>
         )}
 
-        {state.status === 'error' && (
+        {state.status === "error" && (
           <div className="flex flex-col gap-4">
             <Alert variant="destructive">
               <IconAlertTriangle className="size-4" />
@@ -138,4 +140,4 @@ export function DecryptView() {
       </CardContent>
     </Card>
   );
-}
+};

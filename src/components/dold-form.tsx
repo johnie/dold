@@ -1,7 +1,15 @@
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { IconCopy, IconCheck, IconInfoCircle } from "@tabler/icons-react";
+import { hc } from "hono/client";
+import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -9,62 +17,58 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
+} from "@/components/ui/form";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/components/ui/input-group';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { useCallback, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { toast } from 'sonner';
-import { hc } from 'hono/client';
-import type { RouteType } from '@/index';
-import { TTL_OPTIONS } from '@/lib/schemas';
-import { IconCopy, IconCheck, IconInfoCircle } from '@tabler/icons-react';
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import type { RouteType } from "@/index";
+import { TTL_OPTIONS } from "@/lib/schemas";
+import { cn } from "@/lib/utils";
 
-const client = hc<RouteType>('/');
+const client = hc<RouteType>("/");
 
 const formSchema = z.object({
   message: z
     .string()
-    .min(1, 'Message is required')
-    .max(5000, 'Message must be at most 5000 characters'),
+    .min(1, "Message is required")
+    .max(5000, "Message must be at most 5000 characters"),
   ttl: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
+export const DoldForm = ({
+  className,
+  ...props
+}: React.ComponentProps<"div">) => {
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [selectedTtl, setSelectedTtl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
-      message: '',
+      message: "",
       ttl: 3600,
     },
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = useCallback(async (values: FormValues) => {
     const response = await client.api.encrypt.$post({
       json: {
-        message: values.message,
         expirationTtl: values.ttl,
+        message: values.message,
       },
     });
 
@@ -76,15 +80,17 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
         TTL_OPTIONS.find((o) => o.value === values.ttl)?.label ?? null
       );
       setCopied(false);
-      toast('Message encrypted successfully!');
+      toast("Message encrypted successfully!");
     }
   }, []);
 
   const handleCopy = useCallback(async () => {
-    if (!shareUrl) return;
+    if (!shareUrl) {
+      return;
+    }
     await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
-    toast('Link copied to clipboard!');
+    toast("Link copied to clipboard!");
     setTimeout(() => setCopied(false), 2000);
   }, [shareUrl]);
 
@@ -97,7 +103,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
 
   if (shareUrl) {
     return (
-      <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
         <Card>
           <CardHeader>
             <CardTitle>Your secure link</CardTitle>
@@ -108,7 +114,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                 <InputGroupInput
                   readOnly
                   value={shareUrl}
-                  className="font-mono truncate"
+                  className="truncate font-mono"
                 />
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
@@ -134,7 +140,11 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                   permanently deleted.
                 </AlertDescription>
               </Alert>
-              <Button variant="outline" onClick={handleReset} className="w-full">
+              <Button
+                variant="outline"
+                onClick={handleReset}
+                className="w-full"
+              >
                 Encrypt another message
               </Button>
             </div>
@@ -145,7 +155,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
   }
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Encrypt your message with Dold</CardTitle>
@@ -161,10 +171,7 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                     <FormItem>
                       <FormLabel>Message</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Enter your message"
-                          {...field}
-                        />
+                        <Textarea placeholder="Enter your message" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -187,7 +194,10 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
                         </FormControl>
                         <SelectContent>
                           {TTL_OPTIONS.map((opt) => (
-                            <SelectItem key={opt.value} value={String(opt.value)}>
+                            <SelectItem
+                              key={opt.value}
+                              value={String(opt.value)}
+                            >
                               {opt.label}
                             </SelectItem>
                           ))}
@@ -209,4 +219,4 @@ export function DoldForm({ className, ...props }: React.ComponentProps<'div'>) {
       </Card>
     </div>
   );
-}
+};

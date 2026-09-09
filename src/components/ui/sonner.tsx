@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconCircleCheck,
@@ -6,45 +6,45 @@ import {
   IconLoader2,
   IconCircleX,
   IconAlertTriangle,
-} from "@tabler/icons-react"
-import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
+} from "@tabler/icons-react";
+import { useTheme } from "next-themes";
+import type { ToasterProps } from "sonner";
+import { Toaster as Sonner } from "sonner";
 
-type SonnerTheme = NonNullable<ToasterProps["theme"]>
+type SonnerTheme = NonNullable<ToasterProps["theme"]>;
 
-const SONNER_THEMES: readonly SonnerTheme[] = ["light", "dark", "system"] as const
+const isSonnerTheme = (theme: string): theme is SonnerTheme =>
+  theme === "light" || theme === "dark" || theme === "system";
 
-function toSonnerTheme(theme: string): SonnerTheme {
-  return (SONNER_THEMES as readonly string[]).includes(theme)
-    ? (theme as SonnerTheme)
-    : "system"
-}
+const toSonnerTheme = (theme: string): SonnerTheme =>
+  isSonnerTheme(theme) ? theme : "system";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme = "system" } = useTheme();
 
   return (
     <Sonner
       theme={toSonnerTheme(theme)}
       className="toaster group"
       icons={{
-        success: <IconCircleCheck className="size-4" />,
-        info: <IconInfoCircle className="size-4" />,
-        warning: <IconAlertTriangle className="size-4" />,
         error: <IconCircleX className="size-4" />,
+        info: <IconInfoCircle className="size-4" />,
         loading: <IconLoader2 className="size-4 animate-spin" />,
+        success: <IconCircleCheck className="size-4" />,
+        warning: <IconAlertTriangle className="size-4" />,
       }}
       style={
+        // SAFETY: Custom CSS properties for styling Sonner toast container.
         {
-          "--normal-bg": "var(--popover)",
-          "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
           "--border-radius": "var(--radius)",
+          "--normal-bg": "var(--popover)",
+          "--normal-border": "var(--border)",
+          "--normal-text": "var(--popover-foreground)",
         } as React.CSSProperties
       }
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Toaster }
+export { Toaster };
