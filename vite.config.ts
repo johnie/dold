@@ -1,17 +1,17 @@
-import { cloudflare } from '@cloudflare/vite-plugin';
-import { defineConfig } from 'vite';
-import ssrPlugin from 'vite-ssr-components/plugin';
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
+import path from "node:path";
 
-import path from 'path';
+import { cloudflare } from "@cloudflare/vite-plugin";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
+import ssrPlugin from "vite-ssr-components/plugin";
 
 export default defineConfig({
   plugins: [
     cloudflare(),
     ssrPlugin({
       hotReload: {
-        ignore: ['./src/client/**/*.tsx'],
+        ignore: ["./src/client/**/*.tsx"],
       },
     }),
     react(),
@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
 });

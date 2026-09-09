@@ -1,8 +1,10 @@
-import { createRoot } from 'react-dom/client';
-import App from './app';
-import { Toaster } from '@/components/ui/sonner';
+import { createRoot } from "react-dom/client";
 
-const rootElement = document.getElementById('root');
+import { Toaster } from "@/components/ui/sonner";
+
+import App from "./app";
+
+const rootElement = document.querySelector("#root");
 if (rootElement) {
   const root = createRoot(rootElement);
   root.render(

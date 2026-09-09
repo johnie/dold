@@ -1,19 +1,19 @@
-export type DoldApp = {
+export interface DoldApp {
   Bindings: {
     DOLD: KVNamespace;
   };
-};
+}
 
-export type Meta = {
+export interface Meta {
   title: string;
   description?: string;
-};
+}
 
-export type StoredCiphertext = {
+export interface StoredCiphertext {
   encrypted: string;
   iv: string;
-};
+}
 
-export type StoredKey = {
+export interface StoredKey {
   key: JsonWebKey;
-};
+}
