@@ -20,6 +20,7 @@ pnpm cf-typegen   # Generate TypeScript types for Cloudflare bindings
 ## Architecture
 
 ### Stack
+
 - **Backend**: Hono framework on Cloudflare Workers
 - **Frontend**: React 19 with SSR via `@hono/react-renderer`
 - **Storage**: Cloudflare KV Namespace (binding: `DOLD`)
@@ -27,6 +28,7 @@ pnpm cf-typegen   # Generate TypeScript types for Cloudflare bindings
 - **Styling**: Tailwind CSS 4 with shadcn/ui components
 
 ### Source Structure
+
 - `src/index.tsx` - Hono server entry point, configures CORS and routes
 - `src/client/` - Client-side React app (hydrates server-rendered HTML)
 - `src/routes/` - API route handlers (`encrypt.ts`, `decrypt.ts`)
@@ -35,12 +37,14 @@ pnpm cf-typegen   # Generate TypeScript types for Cloudflare bindings
 - `src/types/` - TypeScript type definitions including `DoldApp` bindings
 
 ### Encryption Flow
+
 1. **Encrypt** (`POST /api/encrypt`): Generates AES-GCM 256-bit key, encrypts message, stores ciphertext and key separately in KV with TTL
 2. **Decrypt** (`POST /api/decrypt`): Retrieves and decrypts message, then deletes both KV entries (one-time access)
 
 Key security pattern: Encryption key and ciphertext are stored with different KV keys (`id` and `doldKey`) to prevent exposure if one is compromised.
 
 ### Type System
+
 The `DoldApp` type in `src/types/index.ts` defines Cloudflare bindings. All routes use Zod schemas with `.strict()` to reject extra fields.
 
 ## Conventions

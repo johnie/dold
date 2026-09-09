@@ -2,7 +2,7 @@
 
 Dold is a one-time secret sharing service. Encrypt a message, get a link, share it -- the message is permanently deleted after being read once. Built with [Hono](https://hono.dev) and [React](https://react.dev), deployed on [Cloudflare Workers](https://workers.cloudflare.com) with KV storage.
 
-> **dold** -- Swedish for *hidden*.
+> **dold** -- Swedish for _hidden_.
 
 ## How it works
 
@@ -15,16 +15,16 @@ Dold is a one-time secret sharing service. Encrypt a message, get a link, share 
 
 ## Tech stack
 
-| Layer       | Technology                                    |
-|-------------|-----------------------------------------------|
-| Runtime     | Cloudflare Workers                            |
-| Backend     | Hono                                          |
-| Frontend    | React 19 with SSR via `@hono/react-renderer`  |
-| Storage     | Cloudflare KV                                 |
-| Validation  | Zod (strict schemas via `@hono/zod-validator`) |
-| Styling     | Tailwind CSS 4, shadcn/ui, `cva`              |
-| Build       | Vite with `@cloudflare/vite-plugin`           |
-| Testing     | Vitest                                        |
+| Layer      | Technology                                     |
+| ---------- | ---------------------------------------------- |
+| Runtime    | Cloudflare Workers                             |
+| Backend    | Hono                                           |
+| Frontend   | React 19 with SSR via `@hono/react-renderer`   |
+| Storage    | Cloudflare KV                                  |
+| Validation | Zod (strict schemas via `@hono/zod-validator`) |
+| Styling    | Tailwind CSS 4, shadcn/ui, `cva`               |
+| Build      | Vite with `@cloudflare/vite-plugin`            |
+| Testing    | Vitest                                         |
 
 ## Project structure
 
